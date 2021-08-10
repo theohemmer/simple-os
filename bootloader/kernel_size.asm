@@ -1,0 +1,1 @@
+%define kernel_size 16
