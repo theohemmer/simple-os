@@ -11,13 +11,21 @@ LIB_SRC = $(wildcard kernel/lib/stdio/*.c kernel/lib/stdlib/*.c kernel/lib/strin
 KERNEL_OBJ = $(KERNEL_SRC:.c=.o)
 LIB_OBJ = $(LIB_SRC:.c=.o)
 
+INTERRUPTS = 	interrupts/idt.c \
+				interrupts/isr.c
+
+INTERRUPTS_OBJ = $(INTERRUPTS:.c=.o)
+
+interrupt_handler.o: interrupts/handler.asm
+	nasm $< -f elf -o $@
+
 %.o: %.c
 	$(CC) -ffreestanding -nostdlib -c $< -o $@ -I./
 
 kernel_entry.o: kernel/kernel_entry.asm
 	nasm $< -f elf -o $@
 
-kernel.bin: kernel_entry.o $(KERNEL_OBJ) $(LIB_OBJ)
+kernel.bin: kernel_entry.o $(KERNEL_OBJ) $(LIB_OBJ) $(INTERRUPTS_OBJ) interrupt_handler.o
 	$(LD) -nostdlib -o $@ -Ttext 0x1000 $^ --oformat binary
 
 kernel.elf: kernel_entry.o $(KERNEL_OBJ) $(LIB_OBJ)
@@ -46,6 +54,7 @@ clean:
 	rm -f *.bin
 	rm -f kernel/*.o
 	rm -f kernel/lib/*/*.o
+	rm -f interrupts/*.o
 	rm -f driver/*.o
 	rm -f image_os
 	rm -f kernel.elf

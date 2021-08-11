@@ -1,4 +1,5 @@
 #include "driver/vga_graphic_mode.h"
+#include "interrupts/isr.h"
 #include "kernel/lib/include/stdio.h"
 #include "kernel/lib/include/string.h"
 #include <stddef.h>
@@ -6,11 +7,16 @@
 #include "driver/port.h"
 
 void main() {
+    registers_isr();
+
     port_byte_out(0x70, 0x00); // Tell the CMOS that we want seconds
 
     int time1 = port_byte_in(0x71); // Get the seconds from the RTC
     int time2 = 0;
     int frame_counter = 0;
+    int start_time = time1;
+    int total_frame = 0;
+    int total_seconds = 0;
     unsigned char *vga_buffer = enable_graphic_256_xmode();
 
     int bg_color = 0x0f;
@@ -41,10 +47,14 @@ void main() {
         vga_buffer = switch_buffers();
 
         frame_counter++;
+        total_frame++;
         
         if ((time1 = port_byte_in(0x71)) != time2) {
             time2 = time1;
-            printf("%d FPS\n\r", frame_counter); // Will be written on serial port
+            if (frame_counter != 1) {
+                total_seconds++;
+                printf("%d FPS    Moy: %d\n\r", frame_counter, total_frame / total_seconds); // Will be written on serial port
+            }
             frame_counter = 0;
         }
     }
