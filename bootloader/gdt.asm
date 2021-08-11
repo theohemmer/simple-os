@@ -4,7 +4,7 @@ gdt_start:
 
 ; empty selector
 gdt_null:
-dd 0x0 0000 0000 0000 0000 0000 0000 0000 0000
+dd 0x0
 dd 0x0
 
 ; base: 0x00
