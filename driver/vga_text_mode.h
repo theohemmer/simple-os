@@ -23,8 +23,23 @@
 #define VGA_WIDTH 80
 #define VGA_HEIGHT 25
 
+/*!
+    Put a char on the screen
+    \param c the char to be written
+    \param x X pos on the screen
+    \param y Y pos on the screen
+*/
 void put_char_on_screen(char c, int x, int y);
+
+/*!
+    Scroll the text up on the screen
+*/
 void scroll_up();
+
+/*!
+    Write a string on the screen
+    \param string the string to be written
+*/
 void write_string(const char *string);
 
 #endif

@@ -3,6 +3,7 @@ LD = $$HOME/opt/cross/bin/i686-elf-ld
 
 KERNEL_SRC = 	kernel/kernel.c \
 				driver/vga_text_mode.c \
+				driver/vga_graphic_mode.c \
 				driver/port.c
 
 LIB_SRC = $(wildcard kernel/lib/stdio/*.c kernel/lib/stdlib/*.c kernel/lib/string/*.c)
