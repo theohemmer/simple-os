@@ -34,10 +34,6 @@ extern void isr29(void);
 extern void isr30(void);
 extern void isr31(void);
 
-//0x8ffa0 = erreur
-//0x8ff9c = code
-
-
 void registers_isr(void);
 
 typedef struct reg_s {
