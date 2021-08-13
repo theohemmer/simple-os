@@ -3,7 +3,6 @@
 
 void registers_isr(void)
 {
-    printf("This should print\n\r");
     register_an_interrupt(0, (unsigned int) isr0);
     register_an_interrupt(1, (unsigned int) isr1);
     register_an_interrupt(2, (unsigned int) isr2);
@@ -36,12 +35,9 @@ void registers_isr(void)
     register_an_interrupt(29, (unsigned int) isr29);
     register_an_interrupt(30, (unsigned int) isr30);
     register_an_interrupt(31, (unsigned int) isr31);
-
-    register_the_idt();
-    printf("This should print too\n\r");
 }
 
 void isr_handler(reg_t *test)
 {
-    printf("Called %d %x\n\r", test->code, test->error);
+    printf("ISR Called %d %x\n\r", test->code, test->error);
 }

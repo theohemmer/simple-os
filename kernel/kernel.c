@@ -1,15 +1,22 @@
 #include "driver/vga_graphic_mode.h"
 #include "interrupts/isr.h"
+#include "interrupts/irq.h"
+#include "interrupts/idt.h"
 #include "kernel/lib/include/stdio.h"
 #include "kernel/lib/include/string.h"
 #include <stddef.h>
 #include <stdint.h>
 #include "driver/port.h"
+#include "driver/pic.h"
 
 void main() {
-    port_byte_out(0x21, 0xfd);
-    port_byte_out(0xa1, 0xff);
+    pic_first_init();
     registers_isr();
+    registers_irq();
+    register_the_idt();
+
+    pic_unmask_irq(1);
+    pic_unmask_irq(0);
 
     __asm__ volatile("int $1");
     __asm__ volatile("int $2");

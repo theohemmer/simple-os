@@ -1,7 +1,7 @@
 #ifndef H_IDT
 #define H_IDT
 
-#define NUMBER_OF_INTERRUPTS 32
+#define NUMBER_OF_INTERRUPTS 48
 
 typedef struct {
     unsigned short offset_low;

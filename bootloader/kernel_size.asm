@@ -1,1 +1,1 @@
-%define kernel_size 25
+%define kernel_size 27
