@@ -15,7 +15,8 @@ I want to implements a few little things on this OS:
 - [x] VGA 360x200x256 graphic driver
 - [ ] Keyboard handling
 - [ ] Mouse handling
-- [ ] Memory managment
+- [x] Memory managment
+- [ ] Better Memory managment?
 - [ ] Threads?
 - [ ] File System?
 - [ ] Better Graphics?
