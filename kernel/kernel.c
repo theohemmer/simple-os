@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include "driver/port.h"
 #include "driver/pic.h"
+#include "driver/acpi.h"
 
 void main() {
     pic_first_init();
@@ -15,8 +16,11 @@ void main() {
     registers_irq();
     register_the_idt();
 
+    init_acpi();
+
     pic_unmask_irq(1);
-    pic_unmask_irq(0);
+    //pic_unmask_irq(12);
+    //pic_unmask_irq(0);
 
     __asm__ volatile("int $1");
     __asm__ volatile("int $2");
