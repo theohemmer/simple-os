@@ -1,290 +1,109 @@
 [bits 32]
 [extern isr_handler]
+[extern irq_handler]
 
-handle_interrupt:
-    pushad
+%macro handler_macro 2
+    handle_%+%1:
+        pushad
 
-    mov ax, ds
-    push eax    ; save data segment
+        mov ax, ds
+        push eax    ; save data segment
 
-    mov ax, 0x10
-    mov ds, ax
-    mov es, ax
-    mov gs, ax
-    mov fs, ax  ; set data segments
+        mov ax, 0x10
+        mov ds, ax
+        mov es, ax
+        mov gs, ax
+        mov fs, ax  ; set data segments
 
-    push esp
+        push esp
+        call %2
+        pop eax     ; pop the ESP pushed before the call
 
-    call isr_handler
+        pop eax
+        mov ds, ax
+        mov es, ax
+        mov gs, ax
+        mov fs, ax  ; restore data segments
 
-    pop eax
+        popad
 
-    pop eax
-    mov ds, ax
-    mov es, ax
-    mov gs, ax
-    mov fs, ax  ; restore data segments
+        add esp, 8  ; Remove the 2 params that's left in the stack
+        sti         ; reenable interrupts
+        iret
+%endmacro
 
-    popad
+%macro isr_macro 1-2
+    global isr%+%1
+    isr%+%1:
+        cli
+        %if %0 = 1
+            push byte 0x0
+            push byte %1
+        %else
+            push byte %2
+            push byte %1
+        %endif
+        jmp handle_isr
+%endmacro
 
-    add esp, 8  ; error and code was left in the stack
+%macro irq_macro 2
+    global irq%+%1
+    irq%+%1:
+        cli
+        push byte %2
+        push byte %1
+        jmp handle_irq
+%endmacro
 
-    sti         ; reenable interrupts
+handler_macro isr, isr_handler
+handler_macro irq, irq_handler
 
-    iret
+isr_macro 0, 0  ; Divide By 0
+isr_macro 1, 0  ; Debug
+isr_macro 2, 0  ; Non-Maskable Interrupt
+isr_macro 3, 0  ; Breakpoint
+isr_macro 4, 0  ; Overflow
+isr_macro 5, 0  ; Bound Range Exceeded
+isr_macro 6, 0  ; Invalid OpCode
+isr_macro 7, 0  ; Device Not Available
+isr_macro 8     ; Double Fault
+isr_macro 9, 0  ; Coprocessor Segment Overrun
+isr_macro 10    ; Invalid TTS
+isr_macro 11    ; Segment Not Present
+isr_macro 12    ; Stack-Segment Fault
+isr_macro 13    ; General Protection Fault
+isr_macro 14    ; Page Fault
+isr_macro 15, 0 ; Reserved
+isr_macro 16, 0 ; x87 Floating-Point Exception
+isr_macro 17    ; Alignment Check
+isr_macro 18, 0 ; Machine Check
+isr_macro 19, 0 ; SIMD Floating-Point Exception
+isr_macro 20, 0 ; Virtualization Exception
+isr_macro 21, 0 ; Reserved
+isr_macro 22, 0 ; Reserved
+isr_macro 23, 0 ; Reserved
+isr_macro 24, 0 ; Reserved
+isr_macro 25, 0 ; Reserved
+isr_macro 26, 0 ; Reserved
+isr_macro 27, 0 ; Reserved
+isr_macro 28, 0 ; Reserved
+isr_macro 29, 0 ; Reserved
+isr_macro 30, 0 ; Security Exception
+isr_macro 31, 0 ; Reserved
 
-; Divide By 0
-global isr0
-isr0:
-    cli
-    push byte 0x0
-    push byte 0
-    jmp handle_interrupt
-
-; Debug
-global isr1
-isr1:
-    cli
-    push byte 0xfa
-    push byte 1
-    jmp handle_interrupt
-
-; Non-Maskable Interrupt
-global isr2
-isr2:
-    cli
-    push byte 0x00
-    push byte 2
-    jmp handle_interrupt
-
-; Breakpoint
-global isr3
-isr3:
-    cli
-    push byte 0x0
-    push byte 3
-    jmp handle_interrupt
-
-; Overflow
-global isr4
-isr4:
-    cli
-    push byte 0x0
-    push byte 4
-    jmp handle_interrupt
-
-; Bound Range Exceeded
-global isr5
-isr5:
-    cli
-    push byte 0x0
-    push byte 5
-    jmp handle_interrupt
-
-; Invalid OpCode
-global isr6
-isr6:
-    cli
-    push byte 0x0
-    push byte 6
-    jmp handle_interrupt
-
-; Device Not Available
-global isr7
-isr7:
-    cli
-    push byte 0x0
-    push byte 7
-    jmp handle_interrupt
-
-; Double Fault
-global isr8
-isr8:
-    cli
-    ; Exception has an argument
-    push byte 8
-    jmp handle_interrupt
-
-; Coprocessor Segment Overrun
-global isr9
-isr9:
-    cli
-    push byte 0x00
-    push byte 9
-    jmp handle_interrupt
-
-; Invalid TTS
-global isr10
-isr10:
-    cli
-    ; Exception has an argument
-    push byte 10
-    jmp handle_interrupt
-
-; Segment Not Present
-global isr11
-isr11:
-    cli
-    ; Exception has an argument
-    push byte 11
-    jmp handle_interrupt
-
-; Stack-Segment Fault
-global isr12
-isr12:
-    cli
-    ; Exception has an argument
-    push byte 12
-    jmp handle_interrupt
-
-; General Protection Fault
-global isr13
-isr13:
-    cli
-    ; Exception has an argument
-    push byte 13
-    jmp handle_interrupt
-
-; Page Fault
-global isr14
-isr14:
-    cli
-    ; Exception has an argument
-    push byte 14
-    jmp handle_interrupt
-
-; Reserved
-global isr15
-isr15:
-    cli
-    push byte 0x0
-    push byte 15
-    jmp handle_interrupt
-
-; x87 Floating-Point Exception
-global isr16
-isr16:
-    cli
-    push byte 0x0
-    push byte 16
-    jmp handle_interrupt
-
-; Alignment Check
-global isr17
-isr17:
-    cli
-    ; Exception has an argument
-    push byte 17
-    jmp handle_interrupt
-
-; Machine Check
-global isr18
-isr18:
-    cli
-    push byte 0x0
-    push byte 18
-    jmp handle_interrupt
-
-; SIMD Floating-Point Exception
-global isr19
-isr19:
-    cli
-    push byte 0x0
-    push byte 19
-    jmp handle_interrupt
-
-; Virtualization Exception
-global isr20
-isr20:
-    cli
-    push byte 0x0
-    push byte 20
-    jmp handle_interrupt
-
-; Reserved
-global isr21
-isr21:
-    cli
-    push byte 0x0
-    push byte 21
-    jmp handle_interrupt
-
-; Reserved
-global isr22
-isr22:
-    cli
-    push byte 0x0
-    push byte 22
-    jmp handle_interrupt
-
-; Reserved
-global isr23
-isr23:
-    cli
-    push byte 0x0
-    push byte 23
-    jmp handle_interrupt
-
-; Reserved
-global isr24
-isr24:
-    cli
-    push byte 0x0
-    push byte 24
-    jmp handle_interrupt
-
-; Reserved
-global isr25
-isr25:
-    cli
-    push byte 0x0
-    push byte 25
-    jmp handle_interrupt
-
-; Reserved
-global isr26
-isr26:
-    cli
-    push byte 0x0
-    push byte 26
-    jmp handle_interrupt
-
-; Reserved
-global isr27
-isr27:
-    cli
-    push byte 0x0
-    push byte 27
-    jmp handle_interrupt
-
-; Reserved
-global isr28
-isr28:
-    cli
-    push byte 0x0
-    push byte 28
-    jmp handle_interrupt
-
-; Reserved
-global isr29
-isr29:
-    cli
-    push byte 0x0
-    push byte 29
-    jmp handle_interrupt
-
-; Security Exception
-global isr30
-isr30:
-    cli
-    push byte 0x0
-    push byte 30
-    jmp handle_interrupt
-
-; Reserved
-global isr31
-isr31:
-    cli
-    push byte 0x0
-    push byte 31
-    jmp handle_interrupt
+irq_macro 0, 0  ; Progammable Interrupt Timer Interrupt
+irq_macro 1, 0  ; Keyboard Interrupt
+irq_macro 2, 0  ; Cascade
+irq_macro 3, 0  ; COM2
+irq_macro 4, 0  ; COM1
+irq_macro 5, 0  ; LPT2
+irq_macro 6, 0  ; Floppy Disk
+irq_macro 7, 0  ; LPT1 / Spurious Interrupt
+irq_macro 8, 0  ; CMOS RTC
+irq_macro 9, 0  ; Free for peripherals / NIC
+irq_macro 10, 0 ; Free for peripherals / SCSI / NIC
+irq_macro 11, 0 ; Free for peripherals / SCSI / NIC
+irq_macro 12, 0 ; PS2 Mouse
+irq_macro 13, 0 ; FPU / Coprocessor / Inter-processor
+irq_macro 14, 0 ; Primary ATA Hard Disk
+irq_macro 15, 0 ; Seconday ATA Hard Disk / Spurious Interrupt
