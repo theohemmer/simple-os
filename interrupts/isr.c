@@ -1,5 +1,6 @@
 #include "interrupts/idt.h"
 #include "interrupts/isr.h"
+#include "kernel/lib/include/stdio.h"
 
 void registers_isr(void)
 {

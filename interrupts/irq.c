@@ -2,6 +2,7 @@
 #include "interrupts/irq.h"
 #include "interrupts/isr.h"
 #include "driver/pic.h"
+#include "kernel/lib/include/stdio.h"
 
 void registers_irq(void)
 {
