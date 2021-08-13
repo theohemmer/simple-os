@@ -34,6 +34,17 @@ extern void isr29(void);
 extern void isr30(void);
 extern void isr31(void);
 
+//0x8ffa0 = erreur
+//0x8ff9c = code
+
+
 void registers_isr(void);
+
+typedef struct reg_s {
+    unsigned int eax_save;
+    unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;
+    unsigned int code;
+    unsigned int error;
+} reg_t;
 
 #endif

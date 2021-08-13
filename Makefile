@@ -28,7 +28,7 @@ kernel_entry.o: kernel/kernel_entry.asm
 kernel.bin: kernel_entry.o $(KERNEL_OBJ) $(LIB_OBJ) $(INTERRUPTS_OBJ) interrupt_handler.o
 	$(LD) -nostdlib -o $@ -Ttext 0x1000 $^ --oformat binary
 
-kernel.elf: kernel_entry.o $(KERNEL_OBJ) $(LIB_OBJ)
+kernel.elf: kernel_entry.o $(KERNEL_OBJ) $(LIB_OBJ)  $(INTERRUPTS_OBJ) interrupt_handler.o
 	$(LD) -nostdlib -o $@ -Ttext 0x1000 $^
 
 boot.bin: bootloader/boot.asm

@@ -7,8 +7,12 @@
 #include "driver/port.h"
 
 void main() {
+    port_byte_out(0x21, 0xfd);
+    port_byte_out(0xa1, 0xff);
     registers_isr();
 
+    __asm__ volatile("int $1");
+    __asm__ volatile("int $2");
     port_byte_out(0x70, 0x00); // Tell the CMOS that we want seconds
 
     int time1 = port_byte_in(0x71); // Get the seconds from the RTC

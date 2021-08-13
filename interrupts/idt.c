@@ -21,5 +21,6 @@ void register_the_idt(void)
 {
     idt_params.size = (sizeof(idt_section_t) * NUMBER_OF_INTERRUPTS) - 1;
     idt_params.addr = (unsigned int) &idt;
-    __asm__ volatile("lidtl (%0)" : : "r" (&idt_params));
+    __asm__ volatile("lidt %0" : : "m" (idt_params));
+    __asm__ volatile("sti");
 }

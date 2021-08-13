@@ -2,7 +2,35 @@
 [extern isr_handler]
 
 handle_interrupt:
-    ; TODO, THIS WILL CRASH
+    pushad
+
+    mov ax, ds
+    push eax    ; save data segment
+
+    mov ax, 0x10
+    mov ds, ax
+    mov es, ax
+    mov gs, ax
+    mov fs, ax  ; set data segments
+
+    push esp
+
+    call isr_handler
+
+    pop eax
+
+    pop eax
+    mov ds, ax
+    mov es, ax
+    mov gs, ax
+    mov fs, ax  ; restore data segments
+
+    popad
+
+    add esp, 8  ; error and code was left in the stack
+
+    sti         ; reenable interrupts
+
     iret
 
 ; Divide By 0
@@ -17,7 +45,7 @@ isr0:
 global isr1
 isr1:
     cli
-    push byte 0x0
+    push byte 0xfa
     push byte 1
     jmp handle_interrupt
 
@@ -25,7 +53,7 @@ isr1:
 global isr2
 isr2:
     cli
-    push byte 0x0
+    push byte 0x00
     push byte 2
     jmp handle_interrupt
 
@@ -81,7 +109,7 @@ isr8:
 global isr9
 isr9:
     cli
-    push byte 0x0
+    push byte 0x00
     push byte 9
     jmp handle_interrupt
 

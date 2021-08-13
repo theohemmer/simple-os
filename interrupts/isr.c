@@ -41,8 +41,7 @@ void registers_isr(void)
     printf("This should print too\n\r");
 }
 
-void isr_handler(unsigned int *test)
+void isr_handler(reg_t *test)
 {
-    // TODO
-    printf("Called\n\r");
+    printf("Called %d %x\n\r", test->code, test->error);
 }
