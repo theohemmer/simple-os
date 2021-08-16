@@ -35,8 +35,6 @@ void install_irq_handler(int irq, unsigned int handler)
 
 void irq_handler(reg_t *test)
 {
-    printf("IRQ Called %d %x\n\r", test->code, test->error);
-
     if (handler_fun[test->code] != NULL) {
         void (*fun)(void) = (void (*)(void)) handler_fun[test->code];
         fun();

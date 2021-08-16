@@ -92,5 +92,6 @@ void main() {
             }
             frame_counter = 0;
         }
+        flush_keyboard_queue();
     }
 }
