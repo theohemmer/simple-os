@@ -9,6 +9,9 @@
 #include "driver/port.h"
 #include "driver/pic.h"
 #include "driver/acpi.h"
+#include "driver/ps2.h"
+#include "driver/keyboard.h"
+#include "kernel/lib/include/stdlib.h"
 
 void main() {
     pic_first_init();
@@ -16,10 +19,27 @@ void main() {
     registers_irq();
     register_the_idt();
 
-    init_acpi();
-
     pic_unmask_irq(1);
-    //pic_unmask_irq(12);
+    pic_unmask_irq(2);
+    pic_unmask_irq(12);
+
+    ps2_enable();
+    install_keyboard();
+
+//    init_acpi();
+    printf("Begin malloc test.\n\r");
+    char *test = malloc(sizeof(char) * 50);
+    printf("%x\n\r", test);
+    char *test2 = malloc(sizeof(char) * 10);
+    printf("%x\n\r", test2);
+    free(test2);
+    test2 = malloc(sizeof(char) * 10);
+    printf("%x\n\r", test2);
+    free(test);
+    char *test3 = malloc(sizeof(char) * 10);
+    printf("%x\n\r", test3);
+    printf("Malloc test end.\n\r");
+
     //pic_unmask_irq(0);
 
     __asm__ volatile("int $1");

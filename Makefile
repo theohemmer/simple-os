@@ -7,7 +7,9 @@ KERNEL_SRC = 	kernel/kernel.c \
 				driver/port.c \
 				driver/pic.c \
 				driver/rsdp.c \
-				driver/acpi.c
+				driver/acpi.c \
+				driver/ps2.c \
+				driver/keyboard.c
 
 LIB_SRC = $(wildcard kernel/lib/stdio/*.c kernel/lib/stdlib/*.c kernel/lib/string/*.c)
 
@@ -47,7 +49,7 @@ calculate_kernel_size: kernel.bin
 image: calculate_kernel_size image_os
 
 run: clean image
-	qemu-system-i386 -hda image_os -serial stdio
+	qemu-system-i386 -hda image_os -serial stdio -monitor telnet:localhost:9312,server,nowait
 
 debug: clean image kernel.elf
 	qemu-system-i386 -s -S -hda image_os &

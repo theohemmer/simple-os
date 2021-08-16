@@ -3,6 +3,10 @@
 #include "interrupts/isr.h"
 #include "driver/pic.h"
 #include "kernel/lib/include/stdio.h"
+#include "driver/port.h"
+#include <stddef.h>
+
+static unsigned int handler_fun[16];
 
 void registers_irq(void)
 {
@@ -24,9 +28,18 @@ void registers_irq(void)
     register_an_interrupt(0x2F, (unsigned int) irq15);
 }
 
+void install_irq_handler(int irq, unsigned int handler)
+{
+    handler_fun[irq] = handler;
+}
+
 void irq_handler(reg_t *test)
 {
     printf("IRQ Called %d %x\n\r", test->code, test->error);
 
+    if (handler_fun[test->code] != NULL) {
+        void (*fun)(void) = (void (*)(void)) handler_fun[test->code];
+        fun();
+    }
     pic_send_eio(test->code);
 }

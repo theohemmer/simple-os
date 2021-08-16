@@ -1,6 +1,8 @@
 #ifndef H_IRQ
 #define H_IRQ
 
+#include <stddef.h>
+
 extern void irq0(void);
 extern void irq1(void);
 extern void irq2(void);
@@ -19,5 +21,6 @@ extern void irq14(void);
 extern void irq15(void);
 
 void registers_irq(void);
+void install_irq_handler(int irq, unsigned int handler);
 
 #endif
