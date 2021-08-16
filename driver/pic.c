@@ -13,7 +13,7 @@ void pic_send_eio(unsigned char irq)
 void pic_mask_irq(unsigned char irq)
 {
     if (irq >= 8) {
-        port_byte_out(SPIC_DATA, port_byte_in(SPIC_DATA) | (1 << irq));
+        port_byte_out(SPIC_DATA, port_byte_in(SPIC_DATA) | (1 << (irq - 8)));
     } else {
         port_byte_out(MPIC_DATA, port_byte_in(MPIC_DATA) | (1 << irq));
     }
@@ -22,7 +22,7 @@ void pic_mask_irq(unsigned char irq)
 void pic_unmask_irq(unsigned char irq)
 {
     if (irq >= 8) {
-        port_byte_out(SPIC_DATA, port_byte_in(SPIC_DATA) & ~(1 << irq));
+        port_byte_out(SPIC_DATA, port_byte_in(SPIC_DATA) & ~(1 << (irq - 8)));
     } else {
         port_byte_out(MPIC_DATA, port_byte_in(MPIC_DATA) & ~(1 << irq));
     }
