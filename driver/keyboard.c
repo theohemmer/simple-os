@@ -25,7 +25,7 @@ static void reset_keyboard(unsigned char received, int reset)
         if (received == 0xFA)
             return;
         if (received == 0xAA) {
-            printf("Keyboard self test succed.\n\r");
+            printf(" -- Keyboard self test succed.\n\r");
         } else {
             printf("Keyboard self test failed.\n\r");
         }
@@ -65,7 +65,7 @@ static void get_device_id(unsigned char received, int rs)
             if (reset == 1)
                 break;
         }
-        printf("Device Type ID: %x\n\r", id);
+        printf(" -- Keybord device type ID: %x\n\r", id);
         pop_from_queue(&kb_command_queue);
         push_to_queue(&kb_command_queue, 0xF4, &get_device_id);
         state = 3;

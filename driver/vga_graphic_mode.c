@@ -44,14 +44,14 @@ unsigned char *switch_buffers()
 
     new_addr = (unsigned int) visible_buffer & 0x0FFFF;
 
-    // __asm__ volatile("cli"); TODO : Disable interrupts here before switching buffer
+    __asm__ volatile("cli");
     while (port_byte_in(0x3da) & 0b00001000);
     port_byte_out(0x3d4, 0x0c);
     port_byte_out(0x3d5, (new_addr >> 8));
     port_byte_out(0x3d4, 0x0d);
     port_byte_out(0x3d5, (new_addr & 0xff));
     while (!(port_byte_in(0x3da) & 0b00001000));
-    // __asm__ volatile("sti"); TODO: Re-Enable Interrupts here after switching buffer
+    __asm__ volatile("sti");
 
     return (non_visible_buffer);
 }

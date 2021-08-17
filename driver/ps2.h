@@ -15,6 +15,7 @@
 void ps2_write_command(unsigned char command);
 unsigned char ps2_read_data(unsigned char *timeout);
 unsigned char ps2_write_data(unsigned char data);
+unsigned int bit(int n);
 
 void ps2_enable();
 

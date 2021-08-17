@@ -72,19 +72,17 @@ void ps2_enable()
         printf("PS2 Port 1 Interface check failed.\n\r");
         return;
     }
-    printf("PS2 Port 1 Interface check succeed.\n\r");
+    printf("-> PS2 Port 1 Interface check succeed.\n\r");
 
     ps2_write_command(PS2_INTERFACE_TEST_PORT_2);
     if (ps2_read_data(&dont_care) != 0x0) {
         printf("PS2 Port 2 Interface check failed.\n\r");
         return;
     }
-    printf("PS2 Port 2 Interface check succeed.\n\r");
+    printf("-> PS2 Port 2 Interface check succeed.\n\r");
 
     config |= bit(0); // Enable Interrupts on port 1
     config |= bit(1); // Enable Interrupts on port 2
-
-    printf("%b\n\r", config);
 
     ps2_write_command(PS2_WRITE_CONFIG);
     ps2_write_data(config);
@@ -116,18 +114,6 @@ void ps2_enable()
     /*printf("Searching for Device Types.\n\r");
 
 
-    ps2_write_data(0xF5);
-    while (ps2_read_data() != 0xFA);
-    printf("ACK\n\r");
-    ps2_write_data(0xF2);
-    while (ps2_read_data() != 0xFA);
-    printf("ACK\n\r");
-    unsigned char port_one = ps2_read_data();
-    unsigned char port_two = ps2_read_data();
-
-    printf("Device Type: %x, %x\n", port_one, port_two);
-    ps2_write_data(0xF4);
-
     ps2_write_command(PS2_WRITE_ON_PORT_2);
     ps2_write_data(0xF5);
     while (ps2_read_data() != 0xFA);
@@ -141,7 +127,4 @@ void ps2_enable()
     ps2_write_command(PS2_WRITE_ON_PORT_2);
     ps2_write_data(0xF4);
     while(ps2_read_data() != 0xFA);*/
-
-    ps2_write_command(PS2_READ_CONFIG);
-    printf("---- %b\n\r", ps2_read_data(&dont_care));
 }

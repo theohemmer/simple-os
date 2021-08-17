@@ -10,7 +10,8 @@ KERNEL_SRC = 	kernel/kernel.c \
 				driver/acpi.c \
 				driver/ps2.c \
 				driver/keyboard.c \
-				kernel/command_queue.c
+				kernel/command_queue.c \
+				driver/mouse.c
 
 LIB_SRC = $(wildcard kernel/lib/stdio/*.c kernel/lib/stdlib/*.c kernel/lib/string/*.c)
 
