@@ -15,28 +15,29 @@ void flush_mouse_queue(void)
     }
 }
 
-void reset_mouse(unsigned char readed, unsigned char reset)
+static int reset_mouse(unsigned char readed, unsigned char reset)
 {
     static int state = 0;
+
     if (state == 0) {
         push_to_queue(&ms_command_queue, 0xFF, &reset_mouse);
         state = 1;
-        return;
+        return (1);
     }
     if (state == 1) {
         if (readed == 0xFA)
-            return;
+            return (0);
         if (readed == 0xAA) {
             pop_from_queue(&ms_command_queue);
             push_to_queue(&ms_command_queue, 0xF3, &reset_mouse);
             printf("Mouse self test suceed.\n\r");
             state = 2;
-            return;
+            return (1);
         } else {
             pop_from_queue(&ms_command_queue);
             printf("Mouse self test failed.\n\r");
             state = 0;
-            return;
+            return (0);
         }
     }
     if (state == 2) {
@@ -44,7 +45,7 @@ void reset_mouse(unsigned char readed, unsigned char reset)
             pop_from_queue(&ms_command_queue);
             push_to_queue(&ms_command_queue, 80, &reset_mouse);
             state = 3;
-            return;
+            return (1);
         }
     }
     if (state == 3) {
@@ -52,38 +53,39 @@ void reset_mouse(unsigned char readed, unsigned char reset)
             pop_from_queue(&ms_command_queue);
             printf("Mouse sample rate as been set to 80.\n\r");
             state = 0;
-            return;
+            return (0);
         }
     }
     if (reset == 1) {
         pop_from_queue(&ms_command_queue);
         state = 0;
-        return;
+        return (0);
     }
 }
 
-static void enable_data_reporting(unsigned char received, unsigned char reset)
+static int enable_data_reporting(unsigned char received, unsigned char reset)
 {
     static int state = 0;
 
     if (state == 0) {
         push_to_queue(&ms_command_queue, 0xF4, &enable_data_reporting);
         state = 1;
-        return;
+        return (1);
     }
     if (state == 1) {
         if (received == 0xFA) {
             pop_from_queue(&ms_command_queue);
             printf("Mouse data reporting enabled.\n\r");
             state = 0;
-            return;
+            return (0);
         }
     }
     if (reset == 1) {
         pop_from_queue(&ms_command_queue);
         state = 0;
-        return;
+        return (0);
     }
+    return (0);
 }
 
 mouse_status_t gs_mouse_status(mouse_move_packet_t *move_packet)
@@ -146,7 +148,8 @@ void mouse_handler(void)
         return;
     }
     if (ms_command_queue != NULL) {
-        ms_command_queue->callback(readed, timeout);
+        if (ms_command_queue->callback(readed, timeout) == 1)
+            flush_mouse_queue();
         return;
     }
     mouse_move_handler(readed, timeout);

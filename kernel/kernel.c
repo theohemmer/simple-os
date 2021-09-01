@@ -54,9 +54,9 @@ void main() {
 
     //pic_unmask_irq(0);
 
-    __asm__ volatile("int $1");
-    __asm__ volatile("int $2");
+    __asm__ volatile("cli");
     port_byte_out(0x70, 0x00); // Tell the CMOS that we want seconds
+    __asm__ volatile("sti");
 
     int time1 = port_byte_in(0x71); // Get the seconds from the RTC
     int time2 = 0;
@@ -145,6 +145,7 @@ void main() {
         total_frame++;
         
         if ((time1 = port_byte_in(0x71)) != time2) {
+            printf("Time S: %d\n", time1);
             time2 = time1;
             if (frame_counter != 1) {
                 total_seconds++;

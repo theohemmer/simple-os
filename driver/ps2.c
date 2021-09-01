@@ -11,16 +11,15 @@ unsigned int bit(int n)
 void ps2_write_command(unsigned char command)
 {
     while (!port_byte_in(0x64) & bit(1));
-    port_byte_out(0x64, command); // Disable first channel
+    port_byte_out(0x64, command);
 }
 
 unsigned char ps2_read_data(unsigned char *timeout)
 {
-    int count = 100000;
+    unsigned int count = 100000;
 
-    while (((port_byte_in(0x64) & bit(0)) != 1) && count-- != 0) {
-    }
-    if (count == -1) {
+    while (((port_byte_in(0x64) & bit(0)) != 1) && --count);
+    if (count == 0) {
         printf("READ TIMEOUT.\n\r");
         *timeout = 1;
         return (0);
@@ -91,25 +90,6 @@ void ps2_enable()
     ps2_write_command(PS2_ENABLE_PORT_2);
 
     unsigned char should_retry = 0;
-/*
-    //do {
-    ps2_write_command(PS2_WRITE_ON_PORT_2);
-    ps2_write_data(0xFF); // Reset the second channel
-    //while (ps2_read_data() != 0xAA);
-    /*} while (should_retry == 0xFE);
-    if (should_retry != 0xFA)
-        while (ps2_read_data() != 0xFA);
-    if (ps2_read_data() != 0xAA) {
-        printf("Mouse Self Test failed.----------------\n\r");
-        return;
-    }
-    printf("Mouse Self Test succeed.\n\r");
-    ps2_write_command(PS2_WRITE_ON_PORT_2);
-    ps2_write_data(0xF6);
-  //  while (ps2_read_data() != 0xFA);
-    ps2_write_command(PS2_WRITE_ON_PORT_2);
-    ps2_write_data(0xF4);
-//    while (ps2_read_data() != 0xFA);
 
     /*printf("Searching for Device Types.\n\r");
 

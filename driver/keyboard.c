@@ -12,18 +12,18 @@ void flush_keyboard_queue(void)
         ps2_write_data(kb_command_queue->command);
 }
 
-static void reset_keyboard(unsigned char received, int reset)
+static int reset_keyboard(unsigned char received, int reset)
 {
     static int state = 0;
 
     if (state == 0) {
         push_to_queue(&kb_command_queue, 0xFF, &reset_keyboard);
         state = 1;
-        return;
+        return (1);
     }
     if (state == 1) {
         if (received == 0xFA)
-            return;
+            return (0);
         if (received == 0xAA) {
             printf(" -- Keyboard self test succed.\n\r");
         } else {
@@ -31,14 +31,17 @@ static void reset_keyboard(unsigned char received, int reset)
         }
         pop_from_queue(&kb_command_queue);
         state = 0;
+        return (1);
     }
     if (reset == 1) {
         pop_from_queue(&kb_command_queue);
         state = 0;
+        return (0);
     }
+    return (0);
 }
 
-static void get_device_id(unsigned char received, int rs)
+static int get_device_id(unsigned char received, int rs)
 {
     static int state = 0;
     int id = received;
@@ -47,19 +50,19 @@ static void get_device_id(unsigned char received, int rs)
     if (state == 0) {
         push_to_queue(&kb_command_queue, 0xF5, &get_device_id);
         state = 1;
-        return;
+        return (1);
     }
     if (state == 1) {
         if (received == 0xFA) {
             pop_from_queue(&kb_command_queue);
             push_to_queue(&kb_command_queue, 0xF2, &get_device_id);
             state = 2;
-            return;
+            return (1);
         }
     }
     if (state == 2) {
         if (received == 0xFA)
-            return;
+            return (0);
         while (1) {
             id = (ps2_read_data(&reset) << 8) | id;
             if (reset == 1)
@@ -69,20 +72,21 @@ static void get_device_id(unsigned char received, int rs)
         pop_from_queue(&kb_command_queue);
         push_to_queue(&kb_command_queue, 0xF4, &get_device_id);
         state = 3;
-        return;
+        return (1);
     }
     if (state == 3) {
         if (received == 0xFA) {
             state = 0;
             pop_from_queue(&kb_command_queue);
-            return;
+            return (0);
         }
     }
     if (reset == 1) {
         pop_from_queue(&kb_command_queue);
         state = 0;
-        return;
+        return (0);
     }
+    return (0);
 }
 
 void keyboard_handler(void)
@@ -95,7 +99,8 @@ void keyboard_handler(void)
         return;
     }
     if (kb_command_queue != NULL) {
-        kb_command_queue->callback(readed, timeout);
+        if (kb_command_queue->callback(readed, timeout) == 1)
+            flush_keyboard_queue();
         return;
     }
 }
