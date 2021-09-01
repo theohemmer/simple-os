@@ -2,9 +2,9 @@
 [extern isr_handler]
 [extern irq_handler]
 
-%macro handler_macro 2
+%macro handler_macro 2-3
     handle_%+%1:
-        pushad
+        pusha
 
         mov ax, ds
         push eax    ; save data segment
@@ -17,15 +17,22 @@
 
         push esp
         call %2
-        pop eax     ; pop the ESP pushed before the call
+        pop esp
+        %if %0 = 3
+            pop ebx
+            mov ds, bx
+            mov es, bx
+            mov gs, bx
+            mov fs, bx
+        %else
+            pop eax
+            mov ds, ax
+            mov es, ax
+            mov gs, ax
+            mov fs, ax  ; restore data segments
+        %endif
 
-        pop eax
-        mov ds, ax
-        mov es, ax
-        mov gs, ax
-        mov fs, ax  ; restore data segments
-
-        popad
+        popa
 
         add esp, 8  ; Remove the 2 params that's left in the stack
         sti         ; reenable interrupts
@@ -56,7 +63,7 @@
 %endmacro
 
 handler_macro isr, isr_handler
-handler_macro irq, irq_handler
+handler_macro irq, irq_handler, 1
 
 isr_macro 0, 0  ; Divide By 0
 isr_macro 1, 0  ; Debug

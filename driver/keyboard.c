@@ -89,10 +89,36 @@ static int get_device_id(unsigned char received, int rs)
     return (0);
 }
 
+static int get_kb_scan_code(unsigned char received, int rs)
+{
+    static int state = 0;
+
+    if (state == 0) {
+        state = 1;
+        push_to_queue(&kb_command_queue, 0xF0, &get_kb_scan_code);
+        return (1);
+    }
+    if (state == 1) {
+        if (received == 0xFA)
+            return (0);
+        printf("Scan Code: 0x%x\n\r", received);
+        pop_from_queue(&kb_command_queue);
+        state = 0;
+        return (0);
+    }
+    if (rs == 1) {
+        state = 0;
+        pop_from_queue(&kb_command_queue);
+        return (0);
+    }
+    return (0);
+}
+
 void keyboard_handler(void)
 {
     unsigned char timeout = 0;
     unsigned char readed = ps2_read_data(&timeout);
+    unsigned int keycode = readed;
 
     if (readed == 0xFE && kb_command_queue != NULL) {
         ps2_write_data(kb_command_queue->command);
@@ -103,6 +129,14 @@ void keyboard_handler(void)
             flush_keyboard_queue();
         return;
     }
+    while (1) {
+        keycode <<= 8;
+        keycode |= ps2_read_data(&timeout);
+        if (timeout == 1)
+            break;
+    }
+    keycode >>= 8;
+    printf("Keycode: %x%s\n\r", keycode);
 }
 
 void install_keyboard()
@@ -114,4 +148,5 @@ void install_keyboard()
     install_irq_handler(1, keyboard_handler);
     get_device_id(0, 0);
     reset_keyboard(0, 0);
+    //get_kb_scan_code(0, 0)
 }
