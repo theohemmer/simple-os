@@ -8,6 +8,7 @@
 
         mov ax, ds
         push eax    ; save data segment
+        mov esi, eax
 
         mov ax, 0x10
         mov ds, ax
@@ -15,17 +16,19 @@
         mov gs, ax
         mov fs, ax  ; set data segments
 
-        push esp
+        push esp ; push the stack for the first arg of the c function
         call %2
-        pop esp
+        pop esp ; pop the pushed stack
         %if %0 = 3
             pop ebx
+            mov ebx, esi
             mov ds, bx
             mov es, bx
             mov gs, bx
             mov fs, bx
         %else
             pop eax
+            mov eax, esi
             mov ds, ax
             mov es, ax
             mov gs, ax
@@ -35,7 +38,7 @@
         popa
 
         add esp, 8  ; Remove the 2 params that's left in the stack
-        sti         ; reenable interrupts
+        sti          ; reenable interrupts
         iret
 %endmacro
 

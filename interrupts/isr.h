@@ -41,6 +41,7 @@ typedef struct reg_s {
     unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;
     unsigned int code;
     unsigned int error;
+    //unsigned int eip, cs, eflags, useresp, ss;
 } reg_t;
 
 #endif
