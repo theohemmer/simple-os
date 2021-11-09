@@ -70,6 +70,12 @@ void main() {
     int bg_color = 0x0f;
     int fg_color = 0x00;
 
+    key_t coucou;
+    for (int i = 0; i < 105; i++) {
+        coucou = azerty_fr[i];
+        printf("%b %s\n", coucou.key_number, coucou.name);
+    }
+
     while (1) {
         mouse_status = gs_mouse_status(NULL);
         if (mouse_status.button_right_pressed != mouse_right_pressed) {
@@ -145,12 +151,12 @@ void main() {
         total_frame++;
         
         if ((time1 = port_byte_in(0x71)) != time2) {
-            printf("Time S: %d\n", time1);
+            //printf("Time S: %d\n", time1);
             time2 = time1;
             if (frame_counter != 1) {
                 total_seconds++;
                 moy_fps = total_frame / total_seconds;
-                printf("%d FPS    Moy: %d\n\r", frame_counter, total_frame / total_seconds); // Will be written on serial port
+                //printf("%d FPS    Moy: %d\n\r", frame_counter, total_frame / total_seconds); // Will be written on serial port
             }
             frame_counter = 0;
         }

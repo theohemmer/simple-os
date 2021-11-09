@@ -3,13 +3,16 @@
 #include "kernel/lib/include/stdio.h"
 #include "kernel/lib/include/stdlib.h"
 #include "kernel/command_queue.h"
+#include "driver/keyboard.h"
 
 command_queue_t *kb_command_queue = NULL;
 
 void flush_keyboard_queue(void)
 {
-    if (kb_command_queue != NULL)
+    if (kb_command_queue != NULL) {
+        printf("Flushing queue. %x\n", kb_command_queue->command);
         ps2_write_data(kb_command_queue->command);
+    }
 }
 
 static int reset_keyboard(unsigned char received, int reset)
@@ -93,13 +96,52 @@ static int get_kb_scan_code(unsigned char received, int rs)
 {
     static int state = 0;
 
+    printf("Sate: %d Received: %x\n", state, received);
     if (state == 0) {
         state = 1;
         push_to_queue(&kb_command_queue, 0xF0, &get_kb_scan_code);
         return (1);
     }
-    if (state == 1) {
+    if (state == 1 || state == 2) {
+        if (received == 0xFA && state == 1) {
+            state = 2;
+            pop_from_queue(&kb_command_queue);
+            push_to_queue(&kb_command_queue, 0x00, &get_kb_scan_code);
+            return (1);
+        }
         if (received == 0xFA)
+            return (0);
+        printf("Scan Code: 0x%x\n\r", received);
+        pop_from_queue(&kb_command_queue);
+        state = 0;
+        return (0);
+    }
+    if (rs == 1) {
+        state = 0;
+        pop_from_queue(&kb_command_queue);
+        return (0);
+    }
+    return (0);
+}
+
+static int set_kb_scan_code(unsigned char received, int rs)
+{
+    static int state = 0;
+
+    printf("Sate: %d Received: %x\n", state, received);
+    if (state == 0) {
+        state = 1;
+        push_to_queue(&kb_command_queue, 0xF0, &set_kb_scan_code);
+        return (1);
+    }
+    if (state == 1 || state == 2) {
+        if (received == 0xFA && state == 1) {
+            state = 2;
+            pop_from_queue(&kb_command_queue);
+            push_to_queue(&kb_command_queue, 0x02, &set_kb_scan_code);
+            return (1);
+        }
+        if (received == 0xFA && state != 2)
             return (0);
         printf("Scan Code: 0x%x\n\r", received);
         pop_from_queue(&kb_command_queue);
@@ -129,14 +171,72 @@ void keyboard_handler(void)
             flush_keyboard_queue();
         return;
     }
-    while (1) {
-        keycode <<= 8;
-        keycode |= ps2_read_data(&timeout);
-        if (timeout == 1)
-            break;
+    if (readed != 0xe0 && readed != 0xe1 && readed != 0xf0 && readed != 0x00) {
+        printf("%s\n\r", azerty_fr[scan_code_to_key_nbr[readed]].name);
+    } else {
+        while (1) {
+            keycode <<= 8;
+            readed = ps2_read_data(&timeout);
+            keycode |= readed;
+            if (timeout == 1)
+                break;
+            //printf("%x", readed);
+        }
+        //printf("\n\r");
+        keycode >>= 8;
     }
-    keycode >>= 8;
-    printf("Keycode: %x%s\n\r", keycode);
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
+    printf("");
 }
 
 void install_keyboard()
@@ -146,6 +246,8 @@ void install_keyboard()
     // Set default config, and self-test it
 
     install_irq_handler(1, keyboard_handler);
+    get_kb_scan_code(0, 0);
+    //set_kb_scan_code(0, 0);
     get_device_id(0, 0);
     reset_keyboard(0, 0);
     //get_kb_scan_code(0, 0)

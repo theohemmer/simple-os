@@ -20,7 +20,7 @@ unsigned char ps2_read_data(unsigned char *timeout)
 
     while (((port_byte_in(0x64) & bit(0)) != 1) && --count);
     if (count == 0) {
-        printf("READ TIMEOUT.\n\r");
+        //printf("READ TIMEOUT.\n\r");
         *timeout = 1;
         return (0);
     }
@@ -82,6 +82,7 @@ void ps2_enable()
 
     config |= bit(0); // Enable Interrupts on port 1
     config |= bit(1); // Enable Interrupts on port 2
+    config &= 0b10111111;
 
     ps2_write_command(PS2_WRITE_CONFIG);
     ps2_write_data(config);

@@ -38,7 +38,6 @@
         popa
 
         add esp, 8  ; Remove the 2 params that's left in the stack
-        sti          ; reenable interrupts
         iret
 %endmacro
 
