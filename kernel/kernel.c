@@ -15,9 +15,9 @@
 #include "kernel/lib/include/stdlib.h"
 
 void main() {
-    pic_first_init();
     registers_isr();
     registers_irq();
+    pic_first_init();
     register_the_idt();
 
     pic_unmask_irq(1);

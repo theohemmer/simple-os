@@ -6,7 +6,7 @@ void flush_keyboard_queue(void);
 
 typedef struct {
     int key_number;
-    char name[12];
+    char name[17];
     char is_pressed;
 } key_t;
 
@@ -15,7 +15,7 @@ typedef struct {
     000   00000
     Row   Col
 */
-static const key_t azerty_fr[106] = {
+static const key_t azerty_fr[132] = {
     {(0 << 5) | (0), "VOL_DOWN", 0},
     {(0 << 5) | (1), "VOL_UP", 0},
     {(0 << 5) | (2), "MIC_MUTE", 0},
@@ -121,10 +121,37 @@ static const key_t azerty_fr[106] = {
     {(6 << 5) | (11), "DOWN", 0},
     {(6 << 5) | (12), "NUM 0", 0},
     {(6 << 5) | (13), "NUM .", 0},
+    // Special Key for PS/2 Keyboard start here
+    {(7 << 5) | (0), "SCROLL LOCK", 0},
+    {(7 << 5) | (1), "MULT WWW SEARCH", 0},
+    {(7 << 5) | (2), "MULT PREV TRACK", 0},
+    {(7 << 5) | (3), "MULT WWW FAV", 0},
+    {(7 << 5) | (4), "MULT WWW REFRESH", 0},
+    {(7 << 5) | (4), "MULT MUTE", 0},
+    {(7 << 5) | (5), "SUPER RIGHT", 0},
+    {(7 << 5) | (6), "MULT WWW STOP", 0},
+    {(7 << 5) | (7), "MULT CALCULATOR", 0},
+    {(7 << 5) | (8), "APP KEY", 0},
+    {(7 << 5) | (9), "MULT FORWARD", 0},
+    {(7 << 5) | (10), "MULT PLAY/PAUSE", 0},
+    {(7 << 5) | (11), "ACPI POWER", 0},
+    {(7 << 5) | (12), "MULT BACK", 0},
+    {(7 << 5) | (13), "MULT WWW HOME", 0},
+    {(7 << 5) | (14), "MULT STOP", 0},
+    {(7 << 5) | (15), "ACPI SLEEP", 0},
+    {(7 << 5) | (16), "MULT MY COMPUTER", 0},
+    {(7 << 5) | (17), "MULT EMAIL", 0},
+    {(7 << 5) | (18), "MULT NEXT TRACK", 0},
+    {(7 << 5) | (19), "MULT SELECT", 0},
+    {(7 << 5) | (20), "ACPI WAKE", 0},
+    {(7 << 5) | (21), "HOME", 0},
+    {(7 << 5) | (22), "INSERT", 0},
+    {(7 << 5) | (23), "PAGE DOWN", 0},
+    {(7 << 5) | (24), "PAGE UP", 0},
     {0b11111111, "UNKNOW", 0}
 };
 
-#define UNKNOW_KEY 105
+#define UNKNOW_KEY 151
 
 static const unsigned char scan_code_to_key_nbr[] = {
     [0x00] = UNKNOW_KEY,
@@ -253,12 +280,139 @@ static const unsigned char scan_code_to_key_nbr[] = {
     [0x7B] = 58-19,
     [0x7C] = 57-19,
     [0x7D] = 75-19,
-    [0x7E] = UNKNOW_KEY, // SCROLL LOCK?
+    [0x7E] = 125-19, // SCROLL LOCK?
     [0x7F] = UNKNOW_KEY,
     [0x80] = UNKNOW_KEY,
     [0x81] = UNKNOW_KEY,
     [0x82] = UNKNOW_KEY,
     [0x83] = 31-19
+};
+
+static const unsigned char scan_code_e0_to_key_nbr[] = {
+    [0x00] = UNKNOW_KEY,
+    [0x01] = UNKNOW_KEY,
+    [0x02] = UNKNOW_KEY,
+    [0x03] = UNKNOW_KEY,
+    [0x04] = UNKNOW_KEY,
+    [0x05] = UNKNOW_KEY,
+    [0x06] = UNKNOW_KEY,
+    [0x07] = UNKNOW_KEY,
+    [0x08] = UNKNOW_KEY,
+    [0x09] = UNKNOW_KEY,
+    [0x0A] = UNKNOW_KEY,
+    [0x0B] = UNKNOW_KEY,
+    [0x0C] = UNKNOW_KEY,
+    [0x0D] = UNKNOW_KEY,
+    [0x0E] = UNKNOW_KEY,
+    [0x0F] = UNKNOW_KEY,
+    [0x10] = 126-19, // Multimedia, WWW search
+    [0x11] = 115-19,
+    [0x12] = UNKNOW_KEY,
+    [0x13] = UNKNOW_KEY,
+    [0x14] = 117-19,
+    [0x15] = 127-18, // Multimedia, Previous track
+    [0x16] = UNKNOW_KEY,
+    [0x17] = UNKNOW_KEY,
+    [0x18] = 128-19, // Multimedia, WWW favourites
+    [0x19] = UNKNOW_KEY,
+    [0x1A] = UNKNOW_KEY,
+    [0x1B] = UNKNOW_KEY,
+    [0x1C] = UNKNOW_KEY,
+    [0x1D] = UNKNOW_KEY,
+    [0x1E] = UNKNOW_KEY,
+    [0x1F] = 112-19, // Left GUI Key (super key)
+    [0x20] = 129-19, // Multimedia, WWW refresh
+    [0x21] = 19-19, // Multimedia, Volume down
+    [0x22] = UNKNOW_KEY,
+    [0x23] = 130-19, // Multimedia, Mute
+    [0x24] = UNKNOW_KEY,
+    [0x25] = UNKNOW_KEY,
+    [0x26] = UNKNOW_KEY,
+    [0x27] = 131-19, // Right GUI Key (super key)
+    [0x28] = 132-19, // Multimedia, WWW stop
+    [0x29] = UNKNOW_KEY,
+    [0x2A] = UNKNOW_KEY,
+    [0x2B] = 133-19, // Multimedia, Calculator
+    [0x2C] = UNKNOW_KEY,
+    [0x2D] = UNKNOW_KEY,
+    [0x2F] = 134-19, // Apps key
+    [0x30] = 135-19, // Multimedia, forward
+    [0x31] = UNKNOW_KEY,
+    [0x32] = 20-19, // Multimedia, Volume up
+    [0x33] = UNKNOW_KEY,
+    [0x34] = 136-19, // Multimedia, Play / Pause
+    [0x35] = UNKNOW_KEY,
+    [0x36] = UNKNOW_KEY,
+    [0x37] = 137-19, // ACPI, power
+    [0x38] = 138-19, // Multimedia, Back pressed
+    [0x39] = UNKNOW_KEY,
+    [0x3A] = 139-19, // Multimedia, WWW home
+    [0x3B] = 140-19, // Multimedia, stop
+    [0x3C] = UNKNOW_KEY,
+    [0x3D] = UNKNOW_KEY,
+    [0x3F] = 141-19, // ACPI, sleep
+    [0x40] = 142-19, // Multimedia, my computer
+    [0x41] = UNKNOW_KEY,
+    [0x42] = UNKNOW_KEY,
+    [0x43] = UNKNOW_KEY,
+    [0x44] = UNKNOW_KEY,
+    [0x45] = UNKNOW_KEY,
+    [0x46] = UNKNOW_KEY,
+    [0x47] = UNKNOW_KEY,
+    [0x48] = 143-19, // Multimedia, email
+    [0x49] = UNKNOW_KEY,
+    [0x4A] = 46-19,
+    [0x4B] = UNKNOW_KEY,
+    [0x4C] = UNKNOW_KEY,
+    [0x4D] = 144-19, // Multimedia, Next track
+    [0x4E] = UNKNOW_KEY,
+    [0x4F] = UNKNOW_KEY,
+    [0x50] = 145-19, // Multimedia, Select
+    [0x51] = UNKNOW_KEY,
+    [0x52] = UNKNOW_KEY,
+    [0x53] = UNKNOW_KEY,
+    [0x54] = UNKNOW_KEY,
+    [0x55] = UNKNOW_KEY,
+    [0x56] = UNKNOW_KEY,
+    [0x57] = UNKNOW_KEY,
+    [0x58] = UNKNOW_KEY,
+    [0x59] = UNKNOW_KEY,
+    [0x5A] = 109-19,
+    [0x5B] = UNKNOW_KEY,
+    [0x5C] = UNKNOW_KEY,
+    [0x5D] = UNKNOW_KEY,
+    [0x5E] = 146-19, // ACPI, wake
+    [0x5F] = UNKNOW_KEY,
+    [0x60] = UNKNOW_KEY,
+    [0x61] = UNKNOW_KEY,
+    [0x62] = UNKNOW_KEY,
+    [0x63] = UNKNOW_KEY,
+    [0x64] = UNKNOW_KEY,
+    [0x65] = UNKNOW_KEY,
+    [0x66] = UNKNOW_KEY,
+    [0x67] = UNKNOW_KEY,
+    [0x68] = UNKNOW_KEY,
+    [0x69] = 40-19,
+    [0x6A] = UNKNOW_KEY,
+    [0x6B] = 118-19,
+    [0x6C] = 147-19, // Home
+    [0x6D] = UNKNOW_KEY,
+    [0x6E] = UNKNOW_KEY,
+    [0x6F] = UNKNOW_KEY,
+    [0x70] = 148-19, // Insert
+    [0x71] = 37-19,
+    [0x72] = 121-19,
+    [0x73] = UNKNOW_KEY,
+    [0x74] = 120-19,
+    [0x75] = 119-19,
+    [0x76] = UNKNOW_KEY,
+    [0x77] = UNKNOW_KEY,
+    [0x78] = UNKNOW_KEY,
+    [0x79] = UNKNOW_KEY,
+    [0x7A] = 149-19, // Page Down
+    [0x7B] = UNKNOW_KEY,
+    [0x7C] = UNKNOW_KEY,
+    [0x7D] = 150-19, // Page Up
 };
 
 #endif

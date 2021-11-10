@@ -1,11 +1,11 @@
 [bits 16]
 [org 0x7c00]
 
-KERNEL_OFFSET equ 0x1000
+KERNEL_OFFSET equ 0x8000
 
 mov [BOOT_DRIVE], dl
 
-mov bp, 0x9000 ; Stack base pointer
+mov bp, 0x1000 ; Stack base pointer
 mov sp, bp
 
 mov bx, STARTING_MSG

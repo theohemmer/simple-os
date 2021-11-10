@@ -34,10 +34,10 @@ kernel_entry.o: kernel/kernel_entry.asm
 	nasm $< -f elf -o $@
 
 kernel.bin: kernel_entry.o $(KERNEL_OBJ) $(LIB_OBJ) $(INTERRUPTS_OBJ) interrupt_handler.o
-	$(LD) -nostdlib -o $@ -Ttext 0x1000 $^ --oformat binary
+	$(LD) -nostdlib -o $@ -Ttext 0x8000 $^ --oformat binary
 
 kernel.elf: kernel_entry.o $(KERNEL_OBJ) $(LIB_OBJ)  $(INTERRUPTS_OBJ) interrupt_handler.o
-	$(LD) -nostdlib -o $@ -Ttext 0x1000 $^
+	$(LD) -nostdlib -o $@ -Ttext 0x8000 $^
 
 boot.bin: bootloader/boot.asm
 	nasm $< -f bin -o $@
@@ -54,6 +54,7 @@ run: clean image
 	qemu-system-i386 -hda image_os -serial stdio -monitor telnet:localhost:9312,server,nowait
 
 debug: clean image kernel.elf
+	#~/opt/cross/bin/bochs
 	qemu-system-i386 -s -S -hda image_os &
 	gdb -ex "target remote localhost:1234" -ex "symbol-file kernel.elf"
 

@@ -172,7 +172,19 @@ void keyboard_handler(void)
         return;
     }
     if (readed != 0xe0 && readed != 0xe1 && readed != 0xf0 && readed != 0x00) {
-        printf("%s\n\r", azerty_fr[scan_code_to_key_nbr[readed]].name);
+        printf("%s PRESSED\n\r", azerty_fr[scan_code_to_key_nbr[readed]].name);
+    } else if (readed == 0xf0) {
+        readed = ps2_read_data(&timeout);
+        //printf("%s RELEASED\n\r", azerty_fr[scan_code_to_key_nbr[readed]].name);
+    } else if (readed == 0xe0) {
+        readed = ps2_read_data(&timeout);
+        if (readed == 0xf0) {
+            readed = ps2_read_data(&timeout);
+            //if (readed != 0x0)
+                //printf("%s RELEASED\n\r", azerty_fr[scan_code_e0_to_key_nbr[readed]].name);
+        } else if (readed != 0x0) {
+            printf("%s PRESSED\n\r", azerty_fr[scan_code_e0_to_key_nbr[readed]].name);
+        }
     } else {
         while (1) {
             keycode <<= 8;
@@ -185,58 +197,6 @@ void keyboard_handler(void)
         //printf("\n\r");
         keycode >>= 8;
     }
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
-    printf("");
 }
 
 void install_keyboard()
