@@ -202,15 +202,23 @@ void keyboard_handler(void)
                 printf("%s PRESSED\n\r", azerty_fr[scan_code_e0_to_key_nbr[readed]].name);
         }
     } else {
-        while (1) {
-            printf("%x", readed);
+        for (int looped = 0, is_pause = 0; 1; looped++) {
+            //printf("%x", readed);
             keycode <<= 8;
             readed = ps2_read_data(&timeout);
             keycode |= readed;
             if (timeout == 1)
                 break;
+            if (looped == 2 && keycode == 0xe11477e1) {
+                keycode = 0;
+                is_pause = 1;
+            }
+            if (looped == 6 && keycode == 0xf014f077 && is_pause == 1) {
+                keycode = 0;
+                is_pause = 0;
+                printf("%s PRESSED\n\r", azerty_fr[38 - 19].name);
+            }
         }
-        printf("\n\r");
         keycode >>= 8;
     }
 }
