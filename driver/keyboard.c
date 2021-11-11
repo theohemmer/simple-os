@@ -175,26 +175,42 @@ void keyboard_handler(void)
         printf("%s PRESSED\n\r", azerty_fr[scan_code_to_key_nbr[readed]].name);
     } else if (readed == 0xf0) {
         readed = ps2_read_data(&timeout);
-        //printf("%s RELEASED\n\r", azerty_fr[scan_code_to_key_nbr[readed]].name);
+        printf("%s RELEASED\n\r", azerty_fr[scan_code_to_key_nbr[readed]].name);
     } else if (readed == 0xe0) {
         readed = ps2_read_data(&timeout);
         if (readed == 0xf0) {
             readed = ps2_read_data(&timeout);
-            //if (readed != 0x0)
-                //printf("%s RELEASED\n\r", azerty_fr[scan_code_e0_to_key_nbr[readed]].name);
+            if (readed == 0x7c) {
+                keycode = readed;
+                readed = ps2_read_data(&timeout);
+                if (timeout && keycode != 0x0) // This condition check if there is a timeout, if there is a timeout so it cannot be the impr ecran key
+                    printf("%s RELEASED\n\r", azerty_fr[scan_code_e0_to_key_nbr[keycode]].name);
+                // Check for impr ecran key code
+                else if (readed == 0xe0 && ps2_read_data(&timeout) == 0xf0 && ps2_read_data(&timeout) == 0x12 && !timeout)
+                    printf("%s RELEASED\n\r", azerty_fr[39 - 19].name);
+            } else if (readed != 0x0)
+                printf("%s RELEASED\n\r", azerty_fr[scan_code_e0_to_key_nbr[readed]].name);
         } else if (readed != 0x0) {
-            printf("%s PRESSED\n\r", azerty_fr[scan_code_e0_to_key_nbr[readed]].name);
+            if (readed == 0x12) {
+                keycode = readed;
+                readed = ps2_read_data(&timeout);
+                if (timeout && keycode != 0x0)
+                    printf("%s PRESSED\n\r", azerty_fr[scan_code_e0_to_key_nbr[keycode]].name);
+                else if (readed == 0xe0 && ps2_read_data(&timeout) == 0x7c && !timeout)
+                    printf("%s PRESSED\n\r", azerty_fr[39 - 19].name);
+            } else if (readed != 0x0)
+                printf("%s PRESSED\n\r", azerty_fr[scan_code_e0_to_key_nbr[readed]].name);
         }
     } else {
         while (1) {
+            printf("%x", readed);
             keycode <<= 8;
             readed = ps2_read_data(&timeout);
             keycode |= readed;
             if (timeout == 1)
                 break;
-            //printf("%x", readed);
         }
-        //printf("\n\r");
+        printf("\n\r");
         keycode >>= 8;
     }
 }
