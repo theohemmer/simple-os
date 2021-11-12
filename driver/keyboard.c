@@ -156,6 +156,8 @@ static int set_kb_scan_code(unsigned char received, int rs)
     return (0);
 }
 
+key_t *last_char = &azerty_fr[UNKNOW_KEY];
+
 void keyboard_handler(void)
 {
     unsigned char timeout = 0;
@@ -172,10 +174,12 @@ void keyboard_handler(void)
         return;
     }
     if (readed != 0xe0 && readed != 0xe1 && readed != 0xf0 && readed != 0x00) {
-        printf("%s PRESSED\n\r", azerty_fr[scan_code_to_key_nbr[readed]].name);
+        printf("Pressed: %s\n", azerty_fr[scan_code_to_key_nbr[readed]].name);
+        azerty_fr[scan_code_to_key_nbr[readed]].is_pressed = 1;
+        last_char = azerty_fr[scan_code_to_key_nbr[readed]].aff_min ? &azerty_fr[scan_code_to_key_nbr[readed]] : last_char;
     } else if (readed == 0xf0) {
         readed = ps2_read_data(&timeout);
-        printf("%s RELEASED\n\r", azerty_fr[scan_code_to_key_nbr[readed]].name);
+        azerty_fr[scan_code_to_key_nbr[readed]].is_pressed = 0;
     } else if (readed == 0xe0) {
         readed = ps2_read_data(&timeout);
         if (readed == 0xf0) {
@@ -184,22 +188,26 @@ void keyboard_handler(void)
                 keycode = readed;
                 readed = ps2_read_data(&timeout);
                 if (timeout && keycode != 0x0) // This condition check if there is a timeout, if there is a timeout so it cannot be the impr ecran key
-                    printf("%s RELEASED\n\r", azerty_fr[scan_code_e0_to_key_nbr[keycode]].name);
+                    azerty_fr[scan_code_e0_to_key_nbr[keycode]].is_pressed = 0;
                 // Check for impr ecran key code
                 else if (readed == 0xe0 && ps2_read_data(&timeout) == 0xf0 && ps2_read_data(&timeout) == 0x12 && !timeout)
-                    printf("%s RELEASED\n\r", azerty_fr[39 - 19].name);
+                    azerty_fr[39 - 19].is_pressed = 0;
             } else if (readed != 0x0)
-                printf("%s RELEASED\n\r", azerty_fr[scan_code_e0_to_key_nbr[readed]].name);
+                azerty_fr[scan_code_e0_to_key_nbr[readed]].is_pressed = 0;
         } else if (readed != 0x0) {
             if (readed == 0x12) {
                 keycode = readed;
                 readed = ps2_read_data(&timeout);
-                if (timeout && keycode != 0x0)
-                    printf("%s PRESSED\n\r", azerty_fr[scan_code_e0_to_key_nbr[keycode]].name);
+                if (timeout && keycode != 0x0) {
+                    azerty_fr[scan_code_e0_to_key_nbr[keycode]].is_pressed = 1;
+                    last_char = azerty_fr[scan_code_e0_to_key_nbr[keycode]].aff_min ? &azerty_fr[scan_code_e0_to_key_nbr[keycode]] : last_char;
+                }
                 else if (readed == 0xe0 && ps2_read_data(&timeout) == 0x7c && !timeout)
-                    printf("%s PRESSED\n\r", azerty_fr[39 - 19].name);
-            } else if (readed != 0x0)
-                printf("%s PRESSED\n\r", azerty_fr[scan_code_e0_to_key_nbr[readed]].name);
+                    azerty_fr[39 - 19].is_pressed = 1;
+            } else if (readed != 0x0) {
+                azerty_fr[scan_code_e0_to_key_nbr[readed]].is_pressed = 1;
+                last_char = azerty_fr[scan_code_e0_to_key_nbr[readed]].aff_min ? &azerty_fr[scan_code_e0_to_key_nbr[readed]] : last_char;
+            }
         }
     } else {
         for (int looped = 0, is_pause = 0; 1; looped++) {
@@ -216,11 +224,44 @@ void keyboard_handler(void)
             if (looped == 6 && keycode == 0xf014f077 && is_pause == 1) {
                 keycode = 0;
                 is_pause = 0;
-                printf("%s PRESSED\n\r", azerty_fr[38 - 19].name);
+                azerty_fr[39-19].is_pressed = 1;
+                //printf("%s PRESSED\n\r", azerty_fr[38 - 19].name);
             }
         }
         keycode >>= 8;
     }
+}
+
+unsigned char is_shifted()
+{
+    if (azerty_fr[74].is_pressed)
+        return 1;
+    if (azerty_fr[86].is_pressed)
+        return 1;
+    printf("Not shifted.\n");
+    return 0;
+}
+
+unsigned char is_alted()
+{
+    if (azerty_fr[91].is_pressed && azerty_fr[94].is_pressed)
+        return 1;
+    if (azerty_fr[96].is_pressed)
+        return 1;
+    return 0;
+}
+
+key_t *getch()
+{
+    key_t *to_ret = &azerty_fr[UNKNOW_KEY];
+    size_t count = 1000;
+
+    while (last_char == &azerty_fr[UNKNOW_KEY] && count-- > 1);
+    if (count == 0)
+        return (to_ret);
+    to_ret = last_char;
+    last_char = &azerty_fr[UNKNOW_KEY];
+    return (to_ret);
 }
 
 void install_keyboard()

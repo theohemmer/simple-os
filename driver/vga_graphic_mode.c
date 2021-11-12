@@ -1,6 +1,8 @@
 #include <stddef.h>
 #include "driver/vga_graphic_mode.h"
 #include "driver/port.h"
+#include "driver/font.h"
+#include "driver/ps2.h"
 
 unsigned char *enable_graphic_256_xmode()
 {
@@ -84,4 +86,16 @@ void add_color_to_dac(unsigned char r, unsigned char g, unsigned char b, unsigne
     port_byte_out(0x3c9, g);
     port_byte_out(0x3c9, b);
     previous_index = index;
+}
+
+void display_letter(unsigned char letter, int bg_color, int fg_color, unsigned char *buffer, int screen_x, int screen_y)
+{
+    unsigned char pixel = 0;
+
+    for (int y = 0; y < 16; y++) {
+        for (int x = 0; x < 8; x++) {
+            pixel = g_8x16_font[letter * 16 + y] & bit(x);
+            put_a_pixel((8 - x) + (screen_x * 8), y + (screen_y * 16), pixel == 0 ? bg_color : fg_color, buffer);
+        }
+    }
 }

@@ -35,6 +35,11 @@ void main() {
     int mouse_middle_pressed = 0;
     mouse_status_t mouse_status;
 
+    key_t *last_char = NULL;
+
+    unsigned char test_vga = 0;
+    unsigned int test_vga_loops = 1;
+
 //    init_acpi();
     printf(" /-> Begin malloc/free test.\n\r");
     char *test = malloc(sizeof(char) * 50);
@@ -69,6 +74,12 @@ void main() {
 
     int bg_color = 0x0f;
     int fg_color = 0x00;
+    char to_disp = ' ';
+
+    char *string_to_disp = malloc(sizeof(char) * ((40 * 12) + 1));
+    int act_idx_in_disp = 0;
+
+    memset(string_to_disp, 0, (40*12));
 
     key_t coucou;
     for (int i = 0; i < 105; i++) {
@@ -142,6 +153,41 @@ void main() {
                 pos_y = (pos_y > 199) ? 199 : pos_y;
                 pos_y = (pos_y < 0) ? 0 : pos_y;
                 put_a_pixel(pos_x, pos_y, 0x10, vga_buffer);
+            }
+        }
+
+        key_t *tmp = getch();
+        if (tmp->key_number != 255 && tmp->aff_min != 0) {
+            last_char = tmp;
+            if (is_shifted())
+                to_disp = tmp->aff_maj;
+            else if (is_alted())
+                to_disp = tmp->aff_alt;
+            else
+                to_disp = tmp->aff_min;
+            if (to_disp == 0)
+                to_disp = 32;
+            if (to_disp == '\b') {
+                to_disp = 0;
+                if (act_idx_in_disp != 0)
+                    string_to_disp[--act_idx_in_disp] = to_disp;
+            } else {
+                if (act_idx_in_disp < 40*12)
+                    string_to_disp[act_idx_in_disp++] = to_disp;
+            }
+        }
+
+        for (int i = 0, x = 0, y = 0; string_to_disp[i]; i++) {
+            if (string_to_disp[i] == '\n') {
+                y++;
+                x = 0;
+            } else {
+                display_letter(string_to_disp[i], 0x00, 0x0a, vga_buffer, x, y);
+                x++;
+                if (x == 40) {
+                    x = 0;
+                    y++;
+                }
             }
         }
 

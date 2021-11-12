@@ -13,7 +13,7 @@ I want to implements a few little things on this OS:
 
 - [x] Creating the bootloader
 - [x] VGA 360x200x256 graphic driver
-- [ ] Keyboard handling
+- [x] Keyboard handling
 - [x] Mouse handling
 - [x] Memory managment
 - [ ] Better Memory managment?

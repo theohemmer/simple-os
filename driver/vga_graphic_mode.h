@@ -36,4 +36,6 @@ void put_a_pixel(int x, int y, int color, unsigned char *buffer);
 */
 void change_color_in_dac(unsigned char r, unsigned char g, unsigned char b, unsigned char index);
 
+void display_letter(unsigned char letter, int bg_color, int fg_color, unsigned char *buffer, int x, int y);
+
 #endif
